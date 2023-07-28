@@ -119,7 +119,6 @@ function presetPicker()
 
     local presetPickerLayoutElements = presetPickerLayout:Children()
 
-
     Cmd(string.format('Store DataPool %s', presetPickerDataPoolIndex))
     local presetPickerDataPool = ObjectList('DataPool 3')[1]
     -- local presetPickerDataPool = ShowData().DataPools:Create(presetPickerDataPoolIndex)
@@ -264,9 +263,13 @@ function presetPicker()
                         allMacroLayoutElement.VISIBILITYINDICATORBAR = false
                     end
                 end
-
-                local allMacroLine = allMacro:Aquire(MacroLine, presetPickerUndo)
-                allMacroLine.command = string.format("On %s", sequencePreset:ToAddr())
+                local allMacroLine = allMacro[1]
+                if allMacroLine == nil then
+                    allMacroLine = allMacro:Aquire(MacroLine, presetPickerUndo)
+                    allMacroLine.command = string.format("On DataPool %s Sequence %s", presetPickerDataPool.index, sequencePreset.index)
+                else
+                    allMacroLine.command = string.format("%s + %s", allMacroLine.command, sequencePreset.index)
+                end
             end
         end
     end
