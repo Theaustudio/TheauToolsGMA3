@@ -384,6 +384,8 @@ colorTableConversion = {
     ["orange"] = {255, 165, 0},
     ["gold"] = {255, 215, 0},
     ["or"] = {255, 215, 0},
+    ["ambre"] = {255, 184, 2},
+    ["amber"] = {255, 184, 2},
     ["yellow"] = {255, 255, 0},
     ["jaune"] = {255, 255, 0},
     ["lavender"] = {230, 230, 250},
@@ -401,10 +403,16 @@ colorTableConversion = {
     ["citron"] = {0, 255, 0},
     ["green"] = {0, 128, 0},
     ["vert"] = {0, 128, 0},
+    ["laser"] = {24, 255, 0},
     ["darkcyan"] = {0, 139, 139},
     ["cyanfonce"] = {0, 139, 139},
     ["aqua"] = {0, 255, 255},
     ["cyan"] = {0, 255, 255},
+    ["seagreen"] = {0, 255, 127},
+    ["vertmer"] = {0, 255, 127},
+    ["vertocean"] = {0, 255, 127},
+    ["lightblue"] = {130, 240, 255},
+    ["bleuclair"] = {130, 240, 255},
     ["sky"] = {135, 206, 235},
     ["ciel"] = {135, 206, 235},
     ["blue"] = {0, 0, 255},
@@ -421,11 +429,18 @@ colorTableConversion = {
     ["brun"] = {165, 42, 42},
     ["marron"] = {165, 42, 42},
     ["maroon"] = {128, 0, 0},
-    ["bordeaux"] = {128, 0, 0}
+    ["bordeaux"] = {128, 0, 0},
+    -- filters
+    ["ctb"] = {195, 225, 250},
+    ["201"] = {195, 225, 250},
+    ["l201"] = {195, 225, 250},
+    ["cto"] = {250, 195, 135},
+    ["206"] = {250, 195, 135},
+    ["l206"] = {250, 195, 135},
 }
 
 function nameToRGB(name)
-    return colorTableConversion[string.lower(name)]
+    return colorTableConversion[string.match(string.lower(name), "^%s*(.-)%s*$")]
 end
 
 return main
