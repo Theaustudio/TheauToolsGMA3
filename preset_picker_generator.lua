@@ -314,6 +314,13 @@ function presetToAppearance(preset, presetPickerUndo)
             return preset.appearance, ShowData().Appearances[preset.appearance.index + 1]
         end
     end
+
+    local searchAppearanceOn = ObjectList(string.format('Appearance "%s"', presetToAppearanceNameState(preset, 'On')))[1]
+    local searchAppearanceOff = ObjectList(string.format('Appearance "%s"',presetToAppearanceNameState(preset, 'Off')))[1]
+    if searchAppearanceOn ~= nil and searchAppearanceOff ~= nil then
+        return searchAppearanceOn, searchAppearanceOff
+    end
+
     if presetType == "Color" then
         return presetNameToAppearance(preset, presetPickerUndo)
     end
