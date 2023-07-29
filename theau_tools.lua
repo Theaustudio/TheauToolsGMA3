@@ -17,7 +17,7 @@ local function main(displayHandle)
             backColor = "Assignment.Plugin",
             timeout = 10000,
             timeoutResultCancel = true,
-            icon = "logo_small",
+            icon = "wizard",
         })
     if toolSelectBox.success == false then return end
 

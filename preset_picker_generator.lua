@@ -24,6 +24,8 @@ end
 -- ██║ ╚═╝ ██║██║  ██║██║██║ ╚████║
 -- ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
 local outlineImage, fillImage, presetGeneratorProgressBar
+local pickerDataPoolIndexInput = 3
+local pickerLayoutIndexInput = 20
 
 local function main()
     require 'gma3_debug'()
@@ -57,6 +59,7 @@ function presetPicker()
         MessageBox({
             title = 'Error',
             message = 'Missing symbols, please import them!',
+            icon = 'small_icon_error',
             backColor = "Global.AlertText",
             commands = {{
                 value = 1,
@@ -70,19 +73,24 @@ function presetPicker()
     -- Preset Picker modal options
     local presetPickerOptionsBox = MessageBox({
         title = 'Preset Picker Options',
+        backColor = 'PoolWindow.Presets',
+        icon = 'wizard',
         commands = {{
             value = 1,
             name = "Ok"
+        }, {
+            value = 2,
+            name = "Help"
         }},
         inputs = {{
             name = 'DataPool',
-            value = "3",
+            value = pickerDataPoolIndexInput,
             maxTextLength = 4,
             vkPlugin = "NumericInput",
             whiteFilter = "0123456789"
         }, {
             name = 'Layout',
-            value = "20",
+            value = pickerLayoutIndexInput,
             maxTextLength = 4,
             vkPlugin = "NumericInput",
             whiteFilter = "0123456789"
@@ -97,33 +105,33 @@ function presetPicker()
         ErrEcho('User Aborted')
         return 0
     end
-    
-    -- If layout exist
-    local presetPickerLayout = DataPool().Layouts[tonumber(presetPickerOptionsBox.inputs['Layout'])]
-    if presetPickerLayout == nil then
-        ErrEcho('Layout null')
-        local presetPickerLayoutNilBox = MessageBox({
-            title = 'Error',
-            message = 'The Layout does not exist!',
-            backColor = "Global.AlertText",
+
+    pickerDataPoolIndexInput = tonumber(presetPickerOptionsBox.inputs['DataPool'])
+    pickerLayoutIndexInput = tonumber(presetPickerOptionsBox.inputs['Layout'])
+
+    if presetPickerOptionsBox.result == 2 then
+        MessageBox({
+            title = 'Help',
+            message = 'How to use the Preset Generator ? \n\n1. Assign your groups and presets on the Layout where you want the preset picker to be created \n2. Launch the Plugin and specify the layout number, and the DataPool where the sequences will be stored',
+            icon = 'QuestionMarkIcon',
             commands = {{
                 value = 1,
-                name = "Retry"
-            }, {
-                value = 0,
-                name = "Abort"
-            }}
+                name = "Ok"
+            }},
         })
-        if presetPickerLayoutNilBox.success == true and presetPickerLayoutNilBox.result == 1 then
-            -- relauch function
-            return 2
-        end
-        return 0
+        return 2
+    end
+
+    -- If layout exist
+    local presetPickerLayout = DataPool().Layouts[pickerLayoutIndexInput]
+    if presetPickerLayout == nil then
+        ErrEcho('Layout null')
+        return ErrorMsg('The Layout does not exist!')
     end
 
     -- Options
     local allMacroOption = presetPickerOptionsBox.states['ALL Macro']
-    local presetPickerDataPoolIndex = tonumber(presetPickerOptionsBox.inputs['DataPool'])
+    local presetPickerDataPoolIndex = pickerDataPoolIndexInput
 
     Cmd(string.format('Store DataPool %s', presetPickerDataPoolIndex))
     local presetPickerDataPool = ObjectList('DataPool 3')[1]
@@ -133,22 +141,7 @@ function presetPicker()
     -- Get or Create the DataPool if doesn't exist
     if presetPickerDataPool == nil then
         ErrEcho('DataPool null')
-        local presetPickerDataPoolNilBox = MessageBox({
-            title = 'Error',
-            message = 'The Datapool cannot be created!',
-            backColor = "Global.AlertText",
-            commands = {{
-                value = 1,
-                name = "Retry"
-            }, {
-                value = 0,
-                name = "Abort"
-            }}
-        })
-        if presetPickerDataPoolNilBox.success == true and presetPickerDataPoolNilBox.result == 1 then
-            return 2
-        end
-        return 0
+        return ErrorMsg('The Datapool cannot be created!')
     end
     presetPickerDataPool.name = "Theau Picker Pool"
 
@@ -167,6 +160,16 @@ function presetPicker()
             -- debuggee.print("log", 'group ' .. presetPickerLayoutElement.name)
             table.insert(groupLayoutElements, presetPickerLayoutElement)
         end
+    end
+
+    if #groupLayoutElements == 0 and #presetLayoutElements == 0 then
+        return ErrorMsg('The Layout does not contain groups or presets!')
+    end
+    if #groupLayoutElements == 0 then 
+        return ErrorMsg('The Layout does not contain groups!')
+    end
+    if #presetLayoutElements == 0 then 
+        return ErrorMsg('The Layout does not contain presets!')
     end
 
     -- =============================================================
@@ -505,6 +508,27 @@ colorTableConversion = {
 
 function nameToRGB(name)
     return colorTableConversion[string.match(string.lower(name), "^%s*(.-)%s*$")]
+end
+
+function ErrorMsg(message)
+    local errorMsgBox = MessageBox({
+        title = 'Error',
+        message = message,
+        icon = 'small_icon_error',
+        backColor = "Global.AlertText",
+        commands = {{
+            value = 1,
+            name = "Retry"
+        }, {
+            value = 0,
+            name = "Abort"
+        }}
+    })
+    if errorMsgBox.success == true and errorMsgBox.result == 1 then
+        -- relauch function
+        return 2
+    end
+    return 0
 end
 
 return main
