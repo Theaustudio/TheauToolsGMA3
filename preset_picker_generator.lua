@@ -1,5 +1,4 @@
 --  Preset Picker by Theaustudio
-
 local function testDebugError()
     xpcall(function()
         -- Code to actually run:
@@ -24,6 +23,8 @@ end
 -- ██║╚██╔╝██║██╔══██║██║██║╚██╗██║
 -- ██║ ╚═╝ ██║██║  ██║██║██║ ╚████║
 -- ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
+local outlineImage, fillImage, presetGeneratorProgressBar
+
 local function main()
     require 'gma3_debug'()
     require("gma3_helpers")
@@ -36,11 +37,10 @@ local function main()
             break
         end
     end
+    StopProgress(presetGeneratorProgressBar)
 
     debuggee.print("log", "done")
 end
-
-local outlineImage, fillImage
 
 function presetPicker()
     Cmd("ClearAll")
@@ -112,7 +112,6 @@ function presetPicker()
         end
         return 0
     end
-    
 
     local allMacroOption = presetPickerOptionsBox.states['ALL Macro']
     local presetPickerDataPoolIndex = tonumber(presetPickerOptionsBox.inputs['DataPool'])
@@ -162,7 +161,7 @@ function presetPicker()
     -- debuggee.print("log", 'groupLayoutElements')
     -- debuggee.print("log", gma3_helpers:dump(groupLayoutElements))
 
-    local presetGeneratorProgressBar = StartProgress('PresetGeneratorTheauTools')
+    presetGeneratorProgressBar = StartProgress('PresetGeneratorTheauTools')
     local presetGenProgressBarEndRange = #groupLayoutElements + 1
     SetProgressRange(presetGeneratorProgressBar, 1, presetGenProgressBarEndRange)
     SetProgressText(presetGeneratorProgressBar, 'Preset Generator TheauTools')
@@ -172,7 +171,8 @@ function presetPicker()
 
     for igroup, groupLayoutElement in pairs(groupLayoutElements) do
         local group = groupLayoutElement.object
-        SetProgressText(presetGeneratorProgressBar, string.format('Preset Generator TheauTools (Group %s/%s)', igroup, #groupLayoutElements))
+        SetProgressText(presetGeneratorProgressBar,
+            string.format('Preset Generator TheauTools (Group %s/%s)', igroup, #groupLayoutElements))
         SetProgress(presetGeneratorProgressBar, igroup)
 
         local groupMatricks =
@@ -188,38 +188,50 @@ function presetPicker()
 
         for ipreset, presetLayoutElement in pairs(presetLayoutElements) do
 
-            SetProgressText(presetGeneratorProgressBar, string.format('Preset Generator TheauTools (Group %s/%s | Preset %s/%s)', igroup, #groupLayoutElements, ipreset, #presetLayoutElements))
+            SetProgressText(presetGeneratorProgressBar,
+                string.format('Preset Generator TheauTools (Group %s/%s | Preset %s/%s)', igroup, #groupLayoutElements,
+                    ipreset, #presetLayoutElements))
 
             local preset = presetLayoutElement.object
-            local sequencePreset = presetPickerDataPool.Sequences:Aquire(Sequence, presetPickerUndo)
+
+            local sequencePreset = ObjectList(string.format('%s Sequence "%s"', presetPickerDataPool:ToAddr(),
+                string.format('%s > %s', group.name, preset.name)))[1]
             if sequencePreset == nil then
-                ErrEcho('sequencePreset null')
-                break
+                sequencePreset = presetPickerDataPool.Sequences:Aquire(Sequence, presetPickerUndo)
+
+                if sequencePreset == nil then
+                    ErrEcho('sequencePreset null')
+                    break
+                end
+                local sequencePresetCue = sequencePreset:Aquire(Cue, presetPickerUndo)
+                local sequencePresetCuePart = sequencePresetCue:Create(1, Part, presetPickerUndo)
+                local sequencePresetRecipe = sequencePresetCuePart:Aquire(Recipe, presetPickerUndo)
+
+                sequencePreset.name = string.format('%s > %s', group.name, preset.name)
+                sequencePreset.prefercueappearance = "Yes"
+                sequencePresetRecipe.selection = group
+                sequencePresetRecipe.values = preset
+                sequencePresetRecipe.matricks = groupMatricks
+
+                -- Appearance
+
+                local presetOnAppearance, presetOffAppearance = presetToAppearance(preset, presetPickerUndo)
+
+                if presetOffAppearance and presetOnAppearance then
+                    sequencePreset.appearance = presetOffAppearance
+                    sequencePresetCuePart.appearance = presetOnAppearance
+                else
+                    sequencePreset.appearance = preset.appearance
+                end
+
             end
-            local sequencePresetCue = sequencePreset:Aquire(Cue, presetPickerUndo)
-            local sequencePresetCuePart = sequencePresetCue:Create(1, Part, presetPickerUndo)
-            local sequencePresetRecipe = sequencePresetCuePart:Aquire(Recipe, presetPickerUndo)
-
-            -- Appearance
-
-            local presetOnAppearance, presetOffAppearance = presetToAppearance(preset, presetPickerUndo)
-
-            if presetOffAppearance and presetOnAppearance then
-                sequencePreset.appearance = presetOffAppearance
-                sequencePresetCuePart.appearance = presetOnAppearance
-            else
-                sequencePreset.appearance = preset.appearance
-            end
-
-            sequencePreset.name = string.format('%s > %s', group.name, preset.name)
-            sequencePreset.prefercueappearance = "Yes"
-            sequencePresetRecipe.selection = group
-            sequencePresetRecipe.values = preset
-            sequencePresetRecipe.matricks = groupMatricks
 
             -- Store PresetSequence at Layout
 
-            local sequenceLayoutElement = presetPickerLayout:Aquire(Layout, presetPickerUndo)
+            local sequenceLayoutElement = presetPickerLayout[sequencePreset.name]
+            if sequenceLayoutElement == nil then
+                sequenceLayoutElement = presetPickerLayout:Aquire(Layout, presetPickerUndo)
+            end
             if sequenceLayoutElement == nil then
                 ErrEcho('SequenceLayoutElement null')
                 break
@@ -238,7 +250,7 @@ function presetPicker()
 
             -- ALL Macro
             if allMacroOption then
-                local allMacroName = string.format('ALL %s', preset.name)
+                local allMacroName = string.format('%s ALL %s', presetPickerLayout.index, preset.name)
 
                 local allMacro =
                     ObjectList(string.format('%s Macro "%s"', presetPickerDataPool:ToAddr(), allMacroName))[1]
@@ -266,9 +278,9 @@ function presetPicker()
                 local allMacroLine = allMacro[1]
                 if allMacroLine == nil then
                     allMacroLine = allMacro:Aquire(MacroLine, presetPickerUndo)
-                    allMacroLine.command = string.format("On DataPool %s Sequence %s", presetPickerDataPool.index, sequencePreset.index)
+                    allMacroLine.command = string.format("On %s", sequencePreset:ToAddr())
                 else
-                    allMacroLine.command = string.format("%s + %s", allMacroLine.command, sequencePreset.index)
+                    allMacroLine.command = string.format("%s + %s", allMacroLine.command, sequencePreset:ToAddr())
                 end
             end
         end
@@ -276,12 +288,12 @@ function presetPicker()
 
     SetProgressText(presetGeneratorProgressBar, 'Preset Generator TheauTools (Cooking...)')
     Cmd(string.format('Cook %s Sequence 1 thru /Overwrite', presetPickerDataPool:ToAddr()))
-    
+
     SetProgressText(presetGeneratorProgressBar, 'Preset Generator TheauTools')
     SetProgress(presetGeneratorProgressBar, presetGenProgressBarEndRange)
-    
+
     Cmd(string.format('Select Layout %s', presetPickerLayout.index))
-    
+
     StopProgress(presetGeneratorProgressBar)
     MessageBox({
         title = 'Preset Picker Generator',
@@ -315,8 +327,10 @@ function presetToAppearance(preset, presetPickerUndo)
         end
     end
 
-    local searchAppearanceOn = ObjectList(string.format('Appearance "%s"', presetToAppearanceNameState(preset, 'On')))[1]
-    local searchAppearanceOff = ObjectList(string.format('Appearance "%s"',presetToAppearanceNameState(preset, 'Off')))[1]
+    local searchAppearanceOn =
+        ObjectList(string.format('Appearance "%s"', presetToAppearanceNameState(preset, 'On')))[1]
+    local searchAppearanceOff =
+        ObjectList(string.format('Appearance "%s"', presetToAppearanceNameState(preset, 'Off')))[1]
     if searchAppearanceOn ~= nil and searchAppearanceOff ~= nil then
         return searchAppearanceOn, searchAppearanceOff
     end
@@ -443,7 +457,7 @@ colorTableConversion = {
     ["l201"] = {195, 225, 250},
     ["cto"] = {250, 195, 135},
     ["206"] = {250, 195, 135},
-    ["l206"] = {250, 195, 135},
+    ["l206"] = {250, 195, 135}
 }
 
 function nameToRGB(name)
