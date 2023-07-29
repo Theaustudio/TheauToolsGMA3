@@ -354,6 +354,7 @@ end
 --  ╚═════╝    ╚═╝   ╚═╝╚══════╝
 
 -- Create the appearance with the preset
+-- presetToAppearance(preset: handle, presetPickerUndo: undo): {handle | nil, handle | nil} | nil
 function presetToAppearance(preset, presetPickerUndo)
 
     local presetType = presetToType(preset)
@@ -377,7 +378,7 @@ function presetToAppearance(preset, presetPickerUndo)
 end
 
 -- Return the type of Preset
--- presetToType(preset: handle)
+-- presetToType(preset: handle): string
 function presetToType(preset)
     local presetPool = preset:Parent()
     if presetPool.name then
@@ -386,13 +387,13 @@ function presetToType(preset)
 end
 
 -- Generate the Appearance name with the Preset name and state
--- presetToAppearanceNameState(preset: handle, state: string)
+-- presetToAppearanceNameState(preset: handle, state: string): string
 function presetToAppearanceNameState(preset, state)
     return string.format("<%s> %s", preset.name, state)
 end
 
 -- Create the appearance by guessing the color with the Preset name
--- presetNameToAppearance(preset: handle, presetPickerUndo: undo)
+-- presetNameToAppearance(preset: handle, presetPickerUndo: undo): {handle | nil, handle | nil}
 function presetNameToAppearance(preset, presetPickerUndo)
     local color = colorTableConversion[string.lower(preset.name)]
     if color == nil then
