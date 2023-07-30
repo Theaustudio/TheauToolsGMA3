@@ -133,11 +133,11 @@ function presetPicker()
     local allMacroOption = presetPickerOptionsBox.states['ALL Macro']
     local presetPickerDataPoolIndex = pickerDataPoolIndexInput
 
+    -- =============================================================
     Cmd(string.format('Store DataPool %s', presetPickerDataPoolIndex))
-    local presetPickerDataPool = ObjectList('DataPool 3')[1]
+    local presetPickerDataPool = ObjectList(string.format('DataPool %s', presetPickerDataPoolIndex))[1]
     -- local presetPickerDataPool = ShowData().DataPools:Create(presetPickerDataPoolIndex)
 
-    -- =============================================================
     -- Get or Create the DataPool if doesn't exist
     if presetPickerDataPool == nil then
         ErrEcho('DataPool null')
@@ -272,7 +272,7 @@ function presetPicker()
             sequenceLayoutElement.VISIBILITYBAR = false
             sequenceLayoutElement.VISIBILITYOBJECTNAME = false
             sequenceLayoutElement.VISIBILITYINDICATORBAR = false
-            sequenceLayoutElement.action = OnToken
+            sequenceLayoutElement.action = 'On'
 
             -- =============================================================
             -- ALL Macro
@@ -378,6 +378,8 @@ function presetToAppearance(preset, presetPickerUndo)
     if presetType == "Color" then
         return presetNameToAppearance(preset, presetPickerUndo)
     end
+
+    return presetNameToAppearance(preset, presetPickerUndo)
 end
 
 -- Return the type of Preset
@@ -407,14 +409,12 @@ function presetNameToAppearance(preset, presetPickerUndo)
     local appearanceOutline = ShowData().Appearances:Aquire(Appearance, presetPickerUndo)
     appearanceOutline.name = outlineName
     appearanceOutline.image = outlineImage
-    appearanceOutline.name = outlineName
 
     -- Fill Appearance
     local fillName = presetToAppearanceNameState(preset, "On")
     local appearanceFill = ShowData().Appearances:Aquire(Appearance, presetPickerUndo)
     appearanceFill.name = fillName
     appearanceFill.image = fillImage
-    appearanceFill.name = fillName
 
     appearanceOutline.imager = color[1]
     appearanceOutline.imageg = color[2]
