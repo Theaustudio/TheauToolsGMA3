@@ -13,7 +13,7 @@ local function main(displayHandle)
         {
             title = 'Theau Tools',
             message = 'Please Select a Tool',
-            commands = {{value = 1, name = "Preset Picker Generator"}, {value = 2, name = "Color picker generator"},{value = 3, name = "MAtrix picker generator"}},
+            commands = {{value = 1, name = "Preset Picker Generator"}, {value = 2, name = "MAtrix picker generator"}, {value = 3, name = "Color picker generator"},},
             backColor = "Assignment.Plugin",
             timeout = 10000,
             timeoutResultCancel = true,
