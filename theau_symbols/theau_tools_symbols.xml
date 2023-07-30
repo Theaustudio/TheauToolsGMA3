@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<GMA3 DataVersion="1.9.3.3">
+    <SymbolImage Name="theau_square_fill" FileName="square_fill.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_square_outline" FileName="square_outline.png" FilePath="theau_symbols"/>
+
+    <SymbolImage Name="theau_0" FileName="number_0.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_1" FileName="number_1.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_2" FileName="number_2.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_3" FileName="number_3.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_4" FileName="number_4.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_5" FileName="number_5.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_6" FileName="number_6.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_7" FileName="number_7.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_8" FileName="number_8.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_9" FileName="number_9.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_10" FileName="number_10.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_20" FileName="number_20.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_30" FileName="number_30.png" FilePath="theau_symbols"/>
+
+    <SymbolImage Name="theau_extra_up_plus" FileName="extra_up_plus.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_extra_down_minus" FileName="extra_down_minus.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_extra_left_invert" FileName="extra_left_invert.png" FilePath="theau_symbols"/>
+    <SymbolImage Name="theau_extra_left_invert_on" FileName="extra_left_invert_on.png" FilePath="theau_symbols"/>
+</GMA3>

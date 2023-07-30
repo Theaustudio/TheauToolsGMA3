@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GMA3 DataVersion="0.1.62.0">
-    <UserPlugin Name="ThéauTools" Version="0.0.0.2" Path="/theau_tools">
+    <UserPlugin Name="ThéauTools" Version="0.0.0.2" Path="theau_tools">
 
         <ComponentLua Name="TheauTools" FileName="theau_tools.lua" />
 
-        <ComponentLua Name="ColorPickerGenerator" FileName="color_picker_generator.lua" />
-        <ComponentLua Name="MAtricksPickerGenerator" FileName="matricks_picker_generator.lua" />
-        <ComponentLua Name="PresetPickerGenerator" FileName="preset_picker_generator.lua" />
+        <ComponentLua Name="PresetPickerGenerator" FileName="preset_picker_generator.lua" FilePath="generators"/>
+        <ComponentLua Name="MAtricksPickerGenerator" FileName="matricks_picker_generator.lua" FilePath="generators"/>
     </UserPlugin>
 </GMA3>
