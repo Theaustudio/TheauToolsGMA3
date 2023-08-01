@@ -1,2 +1,2 @@
-# TheauTools GMA
+# TheauTools GMA3
 `WIP`
